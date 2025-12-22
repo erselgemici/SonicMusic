@@ -1,0 +1,244 @@
+@model Sonic_DapperProject.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">@Model.TotalListens.ToString("N0")</h3>
+                            <p class="text-success ms-2 mb-0 font-weight-medium">Anlık</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-success">
+                            <span class="mdi mdi-arrow-top-right icon-item"></span>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Toplam Dinlenme</h6>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">@Model.TotalUsers.ToString("N0")</h3>
+                            <p class="text-success ms-2 mb-0 font-weight-medium">+Yeni</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-primary">
+                            <span class="mdi mdi-account-multiple icon-item"></span>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Kayıtlı Kullanıcı</h6>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">@Model.TotalTracks.ToString("N0")</h3>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-danger">
+                            <span class="mdi mdi-music-note icon-item"></span>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Kütüphanedeki Şarkı</h6>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">@Model.TotalGenres</h3>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-warning">
+                            <span class="mdi mdi-playlist-play icon-item"></span>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Müzik Türü</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">En Çok Dinlenen Türler</h4>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="genreChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Son 7 Günlük Dinlenme</h4>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">En Çok Dinlenen Şarkılar (Top 5)</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th> # </th>
+                                <th> Şarkı Adı </th>
+                                <th> Sanatçı </th>
+                                <th> Albüm </th>
+                                <th> Dinlenme Sayısı </th>
+                                <th> Trend </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.TopSongs != null)
+                            {
+                                int rowNo = 1;
+                                foreach (var item in Model.TopSongs)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (rowNo == 1)
+                                            {
+                                                <span class="badge badge-outline-warning">🥇 1</span>
+                                            }
+                                            else if (rowNo == 2)
+                                            {
+
+                                                <span class="badge badge-outline-secondary">🥈 2</span>
+                                            }
+                                            else if (rowNo == 3)
+                                            {
+
+                                                <span class="badge badge-outline-danger">🥉 3</span>
+                                            }
+                                            else
+                                            {
+
+                                                <span class="text-muted">@rowNo</span>
+                                            }
+                                        </td>
+                                        <td><span class="ps-2">@item.TrackName</span></td>
+                                        <td>@item.ArtistName</td>
+                                        <td>@item.AlbumName</td>
+                                        <td class="text-success">@item.ListenCount.ToString("N0")</td>
+                                        <td><div class="badge badge-outline-success">▲ High</div></td>
+                                    </tr>
+                                    rowNo++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Verileri C#'dan JS'e aktar
+        var genreDataRaw = @Html.Raw(Json.Serialize(Model.GenreGraphData));
+        var dailyDataRaw = @Html.Raw(Json.Serialize(Model.DailyGraphData));
+
+        // 1. PASTA GRAFİK
+        if ($("#genreChart").length) {
+            var genreCtx = document.getElementById('genreChart').getContext('2d');
+            var genreChart = new Chart(genreCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: genreDataRaw.map(x => x.genreName),
+                    datasets: [{
+                        data: genreDataRaw.map(x => x.count),
+                        backgroundColor: ['#00d25b', '#ffab00', '#fc424a', '#0090e7', '#8f5fe8', '#6610f2'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Div boyutuna uymasını sağlar
+                    legend: {
+                        position: 'right',
+                        labels: { fontColor: "#ffffff", boxWidth: 10 }
+                    }
+                }
+            });
+        }
+
+        // 2. ÇİZGİ GRAFİK
+        if ($("#dailyChart").length) {
+            var dailyCtx = document.getElementById('dailyChart').getContext('2d');
+            var dailyChart = new Chart(dailyCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyDataRaw.map(x => x.date),
+                    datasets: [{
+                        label: 'Dinlenme',
+                        data: dailyDataRaw.map(x => x.count),
+                        borderColor: '#00d25b',
+                        backgroundColor: 'rgba(0, 210, 91, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Div boyutuna uymasını sağlar
+                    scales: {
+                        yAxes: [{
+                            gridLines: { color: "rgba(255,255,255,0.05)" },
+                            ticks: { fontColor: "#6c7293", beginAtZero: false }
+                        }],
+                        xAxes: [{
+                            gridLines: { display: false },
+                            ticks: { fontColor: "#6c7293" }
+                        }]
+                    },
+                    legend: { display: false }
+                }
+            });
+        }
+    </script>
+}

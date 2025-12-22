@@ -1,0 +1,175 @@
+@model Sonic_DapperProject.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Gelişmiş Grafikler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h3 class="page-title"> 📊 Detaylı Analiz Merkezi </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">🌍 Global Lokasyonlar (Yatay Analiz)</h4>
+                    <p class="text-muted">Hangi şehirler platformu domine ediyor?</p>
+                    <canvas id="cityHorizontalChart" style="height:250px"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">📱 Cihaz Ekosistemi (Polar)</h4>
+                    <p class="text-muted">Kullanıcıların erişim tercihleri</p>
+                    <canvas id="devicePolarChart" style="height:250px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">🕸️ Müzik Türü Dominasyonu (Radar)</h4>
+                    <p class="text-muted">Platformdaki türlerin baskınlık analizi</p>
+                    <canvas id="genreRadarChart" style="height:250px"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">🍩 Hit Şarkı Payları</h4>
+                    <canvas id="topSongsDoughnutChart" style="height:250px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // RENK PALETLERİ (Spotify Neon Teması)
+    const neonColors = [
+        'rgba(29, 185, 84, 0.7)',  // Spotify Green
+        'rgba(255, 99, 132, 0.7)', // Red
+        'rgba(54, 162, 235, 0.7)', // Blue
+        'rgba(255, 206, 86, 0.7)', // Yellow
+        'rgba(153, 102, 255, 0.7)',// Purple
+        'rgba(255, 159, 64, 0.7)'  // Orange
+    ];
+
+    const borderColors = [
+        'rgba(29, 185, 84, 1)',
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)'
+    ];
+
+    // --- 1. ŞEHİRLER (HORIZONTAL BAR) ---
+    var ctxCity = document.getElementById('cityHorizontalChart').getContext('2d');
+    var cityChart = new Chart(ctxCity, {
+        type: 'bar', // Type bar kalır, indexAxis 'y' yapılır
+        data: {
+            labels: [@Html.Raw(string.Join(",", Model.CityGraphData.Select(x => "'" + x.CityName + "'")))],
+            datasets: [{
+                label: 'Dinlenme Sayısı',
+                data: [@string.Join(",", Model.CityGraphData.Select(x => x.Count))],
+                backgroundColor: neonColors,
+                borderColor: borderColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', // İŞTE BU AYAR ÇUBUKLARI YATAY YAPAR!
+            responsive: true,
+            plugins: {
+                legend: { display: false } // Karmaşa olmasın diye lejantı gizledik
+            }
+        }
+    });
+
+    // --- 2. CİHAZLAR (POLAR AREA) ---
+    var ctxDevice = document.getElementById('devicePolarChart').getContext('2d');
+    var deviceChart = new Chart(ctxDevice, {
+        type: 'polarArea', // Çok şık duran kutup grafiği
+        data: {
+            labels: [@Html.Raw(string.Join(",", Model.DeviceGraphData.Select(x => "'" + x.DeviceType + "'")))],
+            datasets: [{
+                data: [@string.Join(",", Model.DeviceGraphData.Select(x => x.Count))],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }, // Arka plan çizgileri silik
+                    ticks: { display: false } // Sayıları gizle, sadelik için
+                }
+            }
+        }
+    });
+
+    // --- 3. MÜZİK TÜRLERİ (RADAR CHART) ---
+    // NOT: Veriyi GenreGraphData'dan alıyoruz
+    var ctxGenre = document.getElementById('genreRadarChart').getContext('2d');
+    var genreChart = new Chart(ctxGenre, {
+        type: 'radar', // Örümcek Ağı Grafiği
+        data: {
+            labels: [@Html.Raw(string.Join(",", Model.GenreGraphData.Select(x => "'" + x.GenreName + "'")))],
+            datasets: [{
+                label: 'Tür Yoğunluğu',
+                data: [@string.Join(",", Model.GenreGraphData.Select(x => x.Count))],
+                backgroundColor: 'rgba(29, 185, 84, 0.2)', // Spotify yeşili saydam
+                borderColor: '#1DB954',
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#1DB954'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.2)' },
+                    pointLabels: { color: 'white', font: { size: 12 } } // Yazılar beyaz
+                }
+            }
+        }
+    });
+
+    // --- 4. TOP SONGS (DOUGHNUT) ---
+    var ctxSongs = document.getElementById('topSongsDoughnutChart').getContext('2d');
+    var songsChart = new Chart(ctxSongs, {
+        type: 'doughnut', // İçi boş pasta (Simit)
+        data: {
+            labels: [@Html.Raw(string.Join(",", Model.TopSongs.Select(x => "'" + x.TrackName.Replace("'", "") + "'")))],
+            datasets: [{
+                data: [@string.Join(",", Model.TopSongs.Select(x => x.ListenCount))],
+                backgroundColor: neonColors,
+                borderWidth: 0 // Çizgisiz daha modern durur
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '70%', // Ortadaki boşluğu genişlet
+            plugins: {
+                legend: { position: 'right', labels: { color: 'white' } }
+            }
+        }
+    });
+</script>

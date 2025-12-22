@@ -1,0 +1,108 @@
+@model Sonic_DapperProject.Models.MusicLibraryViewModel
+@{
+    ViewData["Title"] = "Müzik Kütüphanesi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <h3 class="page-title">🎵 Müzik Kütüphanesi</h3>
+        </div>
+        <div class="col-md-6">
+            <form method="get" action="/Dashboard/MusicLibrary">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control text-white"
+                           placeholder="Şarkı veya Sanatçı ara..." value="@Model.SearchTerm">
+                    <button class="btn btn-primary" type="submit">Ara</button>
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                    {
+                        <a href="/Dashboard/MusicLibrary" class="btn btn-secondary">Temizle</a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Şarkı</th>
+                            <th>Sanatçı</th>
+                            <th>Albüm</th>
+                            <th>Tür</th>
+                            <th>Süre</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Tracks)
+                        {
+                            <tr>
+                                <td>
+                                    @{
+                                        var albumInitial = item.AlbumName.Substring(0, 1);
+                                        var colors = new[] { "primary", "success", "danger", "warning", "info", "secondary" };
+                                        var randomColor = colors[item.TrackId % 6];
+                                    }
+                                    <div class="rounded bg-@randomColor text-white d-flex align-items-center justify-content-center"
+                                         style="width: 35px; height: 35px; font-weight: bold; font-size: 16px; border-radius: 4px;">
+                                        @albumInitial
+                                    </div>
+                                </td>
+
+                                <td class="font-weight-bold">@item.TrackName</td>
+                                <td>@item.ArtistName</td>
+                                <td class="text-muted">@item.AlbumName</td>
+                                <td><span class="badge badge-outline-primary">@item.GenreName</span></td>
+
+                                <td class="text-muted">
+                                    @{
+                                        var ts = TimeSpan.FromSeconds(item.DurationSeconds);
+                                        // 03:45 formatında göster
+                                    }
+                                    @ts.ToString(@"mm\:ss")
+                                </td>
+
+                                <td>
+                                    <button class="btn btn-success btn-icon-text btn-sm">
+                                        <i class="mdi mdi-play btn-icon-prepend"></i> Dinle
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.TotalPages > 1)
+            {
+                <div class="d-flex justify-content-center mt-4">
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link" href="/Dashboard/MusicLibrary?page=@(Model.CurrentPage - 1)&search=@Model.SearchTerm">❮</a>
+                            </li>
+
+                            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="/Dashboard/MusicLibrary?page=@i&search=@Model.SearchTerm">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="/Dashboard/MusicLibrary?page=@(Model.CurrentPage + 1)&search=@Model.SearchTerm">❯</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
+        </div>
+    </div>
+</div>
