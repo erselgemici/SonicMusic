@@ -1,8 +1,6 @@
 # 🎵 SonicMusic - Advanced Music Analytics Dashboard
 
-![.NET](https://img.shields.io/badge/.NET-6.0-purple) ![C#](https://img.shields.io/badge/C%23-10.0-blue) ![Dapper](https://img.shields.io/badge/ORM-Dapper-red) ![SQL Server](https://img.shields.io/badge/Database-MSSQL-lightgrey) ![Status](https://img.shields.io/badge/Status-Completed-success)
-
-**SonicMusic**, Spotify benzeri dijital müzik platformlarının arka planını simüle eden, **1.5 Milyondan fazla** veriyi yöneten ve analiz eden kapsamlı bir Admin Dashboard projesidir.
+**SonicMusic**, Spotify benzeri dijital müzik platformlarının arka planını simüle eden, **1 Milyondan fazla** veriyi yöneten ve analiz eden kapsamlı bir Admin Dashboard projesidir.
 
 ---
 
